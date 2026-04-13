@@ -1,93 +1,107 @@
-DESAFIO TÉCNICO – BOOTCAMP WEB FRONT (ANGULAR + ASP.NET)
-Objetivo
-Desenvolver uma aplicação web simples para cadastro e gerenciamento de tarefas,
-utilizando Angular no front-end, ASP.NET Core Web API no back-end e SQL
-Server como banco de dados.
-O objetivo do desafio é avaliar conhecimentos básicos de desenvolvimento web,
-integração front-end e back-end, e lógica de programação, considerando um nível
-júnior.
+# Task Manager Web
 
-Tecnologias obrigatórias
- Front-end: Angular
- Back-end: ASP.NET Core Web API (C#)
- Banco de dados: SQL Server
- ORM: Entity Framework Core
- Comunicação: API REST (JSON)
+Aplicacao full stack para cadastro e gerenciamento de tarefas, desenvolvida com Angular no front-end e ASP.NET Core Web API no back-end.
 
-Escopo do Projeto
-Entidade principal: Tarefa
-A aplicação deverá trabalhar com a entidade Tarefa, contendo os seguintes campos:
-Campo Tipo
-Id int (gerado
-automaticamente)
+## Tecnologias
 
-Título string
-Descrição string
-Status string (Pendente /
-Concluída)
+- Angular 20
+- ASP.NET Core 8 Web API
+- Entity Framework Core
+- SQL Server
+- API REST com JSON
 
-Data de
-Criação DateTime
+## Funcionalidades
 
-Funcionalidades obrigatórias
-Back-end (API)
- Criar uma API REST para gerenciar tarefas
- Implementar os seguintes endpoints:
-o GET – Listar todas as tarefas
+- Listagem de tarefas
+- Criacao de tarefa
+- Edicao de tarefa
+- Exclusao de tarefa
+- Filtro por status
+- Validacao basica de formulario
+- Mensagens simples de sucesso e erro
 
-o GET/{id} – Buscar tarefa por ID
-o POST – Criar nova tarefa
-o PUT/{id} – Atualizar uma tarefa
-o DELETE/{id} – Excluir uma tarefa
- Persistir os dados no SQL Server
- Utilizar Entity Framework Core
+## Estrutura do projeto
 
-Front-end (Angular)
- Tela para listar tarefas
- Tela/formulário para criar tarefa
- Possibilidade de editar tarefa
- Possibilidade de excluir tarefa
- Consumo da API utilizando HttpClient
- Organização básica em componentes e services
+- `frontend/`: aplicacao Angular
+- `backend/TaskManager.Api/`: API ASP.NET Core
+- `protagonize-tech.sln`: solucao .NET
 
-Requisitos não obrigatórios (opcionais)
-(Não eliminam se não forem feitos)
- Validação simples de formulário
- Mensagens de sucesso ou erro
- Filtro de tarefas por status
- Layout simples (não será avaliado design avançado)
+## Requisitos
 
-Critérios de Avaliação
-Os candidatos serão avaliados com base nos seguintes critérios:
-Obrigatórios
- Funcionamento correto do CRUD
- Comunicação entre Angular e API
- Organização básica do código
- Uso correto de HTTP (GET, POST, PUT, DELETE)
- Projeto compila e executa corretamente
+- .NET SDK 8
+- Node.js 22+ ou 20 LTS recomendado
+- SQL Server em execucao
 
-Diferenciais (não obrigatórios)
+## Configuracao do banco
 
- Código limpo e bem organizado
- Validações básicas
- Tratamento simples de erros
- README explicando como rodar o projeto
- Commits organizados no Git
+A API usa a connection string abaixo por padrao em `backend/TaskManager.Api/appsettings.json`:
 
-O que não será avaliado
- Design avançado
- Autenticação / login
- Arquitetura complexa
- Padrões avançados (DDD, CQRS, etc.)
+```json
+"DefaultConnection": "Server=localhost;Database=TaskManagerDb;Trusted_Connection=True;TrustServerCertificate=True;"
+```
 
-Carga horária estimada
-80 horas, distribuídas entre:
- Planejamento
- Desenvolvimento back-end
- Desenvolvimento front-end
- Integração
- Ajustes finais
+Se o seu SQL Server usar outro host, instancia ou autenticacao, ajuste essa string antes de executar.
 
-Entrega
- Código-fonte em repositório Git (GitHub, GitLab ou similar)
- README com instruções para execução do projeto
+## Como rodar o back-end
+
+No diretorio raiz:
+
+```bash
+dotnet build backend/TaskManager.Api/TaskManager.Api.csproj
+dotnet run --project backend/TaskManager.Api/TaskManager.Api.csproj
+```
+
+API disponivel em:
+
+- `http://localhost:5063`
+- Swagger: `http://localhost:5063/swagger`
+
+## Como rodar o front-end
+
+No diretorio `frontend/`:
+
+```bash
+npm install
+npm start
+```
+
+Aplicacao disponivel em:
+
+- `http://localhost:4200`
+
+Para gerar a build de producao:
+
+```bash
+npm run build
+```
+
+## Endpoints da API
+
+- `GET /api/tasks`: lista todas as tarefas
+- `GET /api/tasks/{id}`: busca tarefa por id
+- `POST /api/tasks`: cria uma nova tarefa
+- `PUT /api/tasks/{id}`: atualiza uma tarefa
+- `DELETE /api/tasks/{id}`: remove uma tarefa
+
+## Exemplo de payload
+
+```json
+{
+  "titulo": "Estudar Angular",
+  "descricao": "Criar a tela de cadastro de tarefas",
+  "status": "Pendente"
+}
+```
+
+## Observacoes
+
+- A API tenta criar a base automaticamente com `EnsureCreated()` quando sobe.
+- O front esta configurado para consumir a API em `http://localhost:5063/api/tasks`.
+- Se houver erro de conexao, confira se o SQL Server e a API estao em execucao.
+
+## Validacoes implementadas
+
+- Titulo obrigatorio com maximo de 150 caracteres
+- Descricao obrigatoria com maximo de 500 caracteres
+- Status obrigatorio
+- Aceita apenas `Pendente` ou `Concluida` na API

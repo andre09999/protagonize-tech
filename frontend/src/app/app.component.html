@@ -1,0 +1,25 @@
+<main class="page-shell">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Bootcamp Web Front</p>
+      <h1>Gerenciamento de tarefas com Angular + ASP.NET</h1>
+      <p class="hero-copy">
+        Cadastre, acompanhe e atualize tarefas em uma interface simples, com consumo da API REST em tempo real.
+      </p>
+    </div>
+  </section>
+
+  <section class="grid">
+    <app-task-form
+      [selectedTask]="selectedTask"
+      (saved)="handleTaskSaved()"
+      (cancelled)="handleCancel()">
+    </app-task-form>
+
+    <app-task-list
+      [refreshToken]="refreshToken"
+      (editRequested)="handleEdit($event)"
+      (deleted)="handleDeleted($event)">
+    </app-task-list>
+  </section>
+</main>
