@@ -11,9 +11,35 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
+    public DbSet<AppUser> Users => Set<AppUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AppUser>(entity =>
+        {
+            entity.ToTable("Users");
+
+            entity.HasKey(user => user.Id);
+
+            entity.Property(user => user.Username)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(user => user.NormalizedUsername)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(user => user.PasswordHash)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(user => user.DataCriacao)
+                .IsRequired();
+
+            entity.HasIndex(user => user.NormalizedUsername)
+                .IsUnique();
+        });
+
         modelBuilder.Entity<TaskItem>(entity =>
         {
             entity.ToTable("Tasks");
@@ -34,6 +60,11 @@ public class AppDbContext : DbContext
 
             entity.Property(task => task.DataCriacao)
                 .IsRequired();
+
+            entity.HasOne(task => task.AppUser)
+                .WithMany(user => user.Tasks)
+                .HasForeignKey(task => task.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

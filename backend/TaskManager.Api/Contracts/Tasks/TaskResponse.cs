@@ -1,4 +1,4 @@
-namespace TaskManager.Api.Dtos;
+namespace TaskManager.Api.Contracts.Tasks;
 
 public record TaskResponse(
     int Id,

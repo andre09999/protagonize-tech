@@ -1,136 +1,54 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TaskManager.Api.Data;
-using TaskManager.Api.Dtos;
-using TaskManager.Api.Entities;
+using TaskManager.Api.Contracts.Tasks;
+using TaskManager.Api.Services.Tasks;
 
 namespace TaskManager.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TasksController : ControllerBase
 {
-    private static readonly string[] AllowedStatus = ["Pendente", "Concluida"];
+    private readonly ITaskService _taskService;
 
-    private readonly AppDbContext _context;
-
-    public TasksController(AppDbContext context)
+    public TasksController(ITaskService taskService)
     {
-        _context = context;
+        _taskService = taskService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAll([FromQuery] string? status)
+    public async Task<ActionResult<IReadOnlyCollection<TaskResponse>>> GetAll([FromQuery] string? status, CancellationToken cancellationToken)
     {
-        var query = _context.Tasks.AsNoTracking().AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(status))
-        {
-            query = query.Where(task => task.Status == status);
-        }
-
-        var tasks = await query
-            .OrderByDescending(task => task.DataCriacao)
-            .Select(task => new TaskResponse(
-                task.Id,
-                task.Titulo,
-                task.Descricao,
-                task.Status,
-                task.DataCriacao))
-            .ToListAsync();
-
-        return Ok(tasks);
+        var response = await _taskService.GetAllAsync(status, cancellationToken);
+        return Ok(response);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TaskResponse>> GetById(int id)
+    public async Task<ActionResult<TaskResponse>> GetById(int id, CancellationToken cancellationToken)
     {
-        var task = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(task => task.Id == id);
-
-        if (task is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(new TaskResponse(task.Id, task.Titulo, task.Descricao, task.Status, task.DataCriacao));
+        var response = await _taskService.GetByIdAsync(id, cancellationToken);
+        return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request)
+    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request, CancellationToken cancellationToken)
     {
-        var normalizedStatus = NormalizeStatus(request.Status);
-
-        if (normalizedStatus is null)
-        {
-            return BadRequest(new { message = "Status invalido. Use Pendente ou Concluida." });
-        }
-
-        var task = new TaskItem
-        {
-            Titulo = request.Titulo.Trim(),
-            Descricao = request.Descricao.Trim(),
-            Status = normalizedStatus,
-            DataCriacao = DateTime.UtcNow
-        };
-
-        _context.Tasks.Add(task);
-        await _context.SaveChangesAsync();
-
-        var response = new TaskResponse(task.Id, task.Titulo, task.Descricao, task.Status, task.DataCriacao);
-
-        return CreatedAtAction(nameof(GetById), new { id = task.Id }, response);
+        var response = await _taskService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<TaskResponse>> Update(int id, UpdateTaskRequest request)
+    public async Task<ActionResult<TaskResponse>> Update(int id, UpdateTaskRequest request, CancellationToken cancellationToken)
     {
-        var task = await _context.Tasks.FirstOrDefaultAsync(item => item.Id == id);
-
-        if (task is null)
-        {
-            return NotFound();
-        }
-
-        var normalizedStatus = NormalizeStatus(request.Status);
-
-        if (normalizedStatus is null)
-        {
-            return BadRequest(new { message = "Status invalido. Use Pendente ou Concluida." });
-        }
-
-        task.Titulo = request.Titulo.Trim();
-        task.Descricao = request.Descricao.Trim();
-        task.Status = normalizedStatus;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new TaskResponse(task.Id, task.Titulo, task.Descricao, task.Status, task.DataCriacao));
+        var response = await _taskService.UpdateAsync(id, request, cancellationToken);
+        return Ok(response);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var task = await _context.Tasks.FirstOrDefaultAsync(item => item.Id == id);
-
-        if (task is null)
-        {
-            return NotFound();
-        }
-
-        _context.Tasks.Remove(task);
-        await _context.SaveChangesAsync();
-
+        await _taskService.DeleteAsync(id, cancellationToken);
         return NoContent();
-    }
-
-    private static string? NormalizeStatus(string status)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            return null;
-        }
-
-        return AllowedStatus.FirstOrDefault(allowed =>
-            string.Equals(allowed, status.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 }
