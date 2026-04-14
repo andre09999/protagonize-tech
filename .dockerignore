@@ -1,0 +1,11 @@
+.git
+.gitignore
+**/bin
+**/obj
+**/dist
+**/coverage
+**/node_modules
+**/.angular
+**/.vs
+**/*.user
+**/*.suo

@@ -1,25 +1,46 @@
 <main class="page-shell">
+  <header class="topbar">
+    <div class="brand-block">
+      <p class="eyebrow">Task Manager Full Stack</p>
+      <h1>Angular, .NET, JWT, Redis e RabbitMQ em uma unica entrega</h1>
+    </div>
+
+    <div class="topbar-actions">
+      <button type="button" class="theme-button" (click)="toggleTheme()">{{ currentThemeLabel() }}</button>
+
+      <div *ngIf="isAuthenticated()" class="user-card">
+        <span>{{ currentUser()?.username }}</span>
+        <button type="button" class="logout-button" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
   <section class="hero">
     <div>
-      <p class="eyebrow">Bootcamp Web Front</p>
-      <h1>Gerenciamento de tarefas com Angular + ASP.NET</h1>
+      <p class="eyebrow">Desafio tecnico evoluido</p>
+      <h2>Fluxo completo com autenticacao, tema alternavel e infraestrutura pronta para Docker</h2>
       <p class="hero-copy">
-        Cadastre, acompanhe e atualize tarefas em uma interface simples, com consumo da API REST em tempo real.
+        O front conversa com a API protegida por JWT, enquanto o backend usa SQL Server, cache Redis,
+        fila RabbitMQ, validacao com FluentValidation e logs estruturados com Serilog.
       </p>
     </div>
   </section>
 
-  <section class="grid">
-    <app-task-form
-      [selectedTask]="selectedTask"
-      (saved)="handleTaskSaved()"
-      (cancelled)="handleCancel()">
-    </app-task-form>
+  <app-auth-panel *ngIf="!isAuthenticated(); else taskWorkspace" (authenticated)="handleAuthenticated()"></app-auth-panel>
 
-    <app-task-list
-      [refreshToken]="refreshToken"
-      (editRequested)="handleEdit($event)"
-      (deleted)="handleDeleted($event)">
-    </app-task-list>
-  </section>
+  <ng-template #taskWorkspace>
+    <section class="grid">
+      <app-task-form
+        [selectedTask]="selectedTask"
+        (saved)="handleTaskSaved()"
+        (cancelled)="handleCancel()">
+      </app-task-form>
+
+      <app-task-list
+        [refreshToken]="refreshToken"
+        (editRequested)="handleEdit($event)"
+        (deleted)="handleDeleted($event)">
+      </app-task-list>
+    </section>
+  </ng-template>
 </main>

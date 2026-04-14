@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, injec
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Task, TaskRequest } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 @Component({
   selector: 'app-task-form',
@@ -57,9 +58,9 @@ export class TaskFormComponent implements OnChanges {
         this.form.reset({ titulo: '', descricao: '', status: 'Pendente' });
         this.saved.emit();
       },
-      error: () => {
+      error: (error: unknown) => {
         this.submitting = false;
-        this.setFeedback('error', 'Nao foi possivel salvar a tarefa. Verifique a API.');
+        this.setFeedback('error', extractApiErrorMessage(error, 'Nao foi possivel salvar a tarefa.'));
       }
     });
   }

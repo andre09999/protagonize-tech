@@ -35,7 +35,9 @@ public class TaskService : ITaskService
     public async Task<IReadOnlyCollection<TaskResponse>> GetAllAsync(string? status, CancellationToken cancellationToken = default)
     {
         var userId = _currentUserService.UserId;
-        var normalizedStatus = NormalizeStatus(status);
+        var normalizedStatus = string.IsNullOrWhiteSpace(status)
+            ? null
+            : NormalizeStatus(status);
 
         var cachedTasks = await _taskCacheService.GetTasksAsync(userId, normalizedStatus, cancellationToken);
 

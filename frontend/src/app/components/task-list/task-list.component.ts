@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 @Component({
   selector: 'app-task-list',
@@ -41,9 +42,9 @@ export class TaskListComponent implements OnInit, OnChanges {
         this.tasks = tasks;
         this.loading = false;
       },
-      error: () => {
+      error: (error: unknown) => {
         this.loading = false;
-        this.errorMessage = 'Nao foi possivel carregar as tarefas. Confirme se a API esta em execucao.';
+        this.errorMessage = extractApiErrorMessage(error, 'Nao foi possivel carregar as tarefas.');
       }
     });
   }
@@ -63,8 +64,8 @@ export class TaskListComponent implements OnInit, OnChanges {
         this.deleted.emit(task.id);
         this.loadTasks();
       },
-      error: () => {
-        this.errorMessage = 'Nao foi possivel excluir a tarefa.';
+      error: (error: unknown) => {
+        this.errorMessage = extractApiErrorMessage(error, 'Nao foi possivel excluir a tarefa.');
       }
     });
   }

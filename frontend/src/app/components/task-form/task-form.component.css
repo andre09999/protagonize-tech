@@ -4,7 +4,7 @@
   border: 1px solid var(--line);
   background: var(--surface);
   backdrop-filter: blur(12px);
-  box-shadow: 0 18px 40px rgba(31, 41, 55, 0.08);
+  box-shadow: 0 18px 40px var(--shadow);
 }
 
 .panel-header {
@@ -48,7 +48,7 @@ textarea,
 select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(107, 114, 128, 0.3);
+  border: 1px solid var(--field-line);
   border-radius: 14px;
   background: var(--surface-strong);
   color: var(--text);

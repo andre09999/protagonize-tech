@@ -1,8 +1,8 @@
 namespace TaskManager.Api.Contracts.Tasks;
 
-public class UpdateTaskRequest
+public sealed record UpdateTaskRequest
 {
-    public string Titulo { get; set; } = string.Empty;
-    public string Descricao { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public string Titulo { get; init; } = string.Empty;
+    public string Descricao { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
 }

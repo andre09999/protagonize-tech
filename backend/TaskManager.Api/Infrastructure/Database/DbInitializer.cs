@@ -17,6 +17,7 @@ public static class DbInitializer
             {
                 await dbContext.Database.EnsureCreatedAsync(cancellationToken);
                 logger.LogInformation("Banco de dados inicializado com sucesso na tentativa {Attempt}", attempt);
+                await DatabaseSeeder.SeedAsync(scope.ServiceProvider, cancellationToken);
                 return;
             }
             catch (Exception ex) when (attempt < 10)
@@ -27,5 +28,6 @@ public static class DbInitializer
         }
 
         await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+        await DatabaseSeeder.SeedAsync(scope.ServiceProvider, cancellationToken);
     }
 }
