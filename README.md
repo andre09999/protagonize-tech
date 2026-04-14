@@ -1,49 +1,87 @@
 # Task Manager Web
 
-Aplicacao full stack para gerenciamento de tarefas com Angular no frontend e ASP.NET Core Web API no backend. Esta versao evolui o desafio original com autenticacao JWT, persistencia em banco relacional, cache com Redis, mensageria com RabbitMQ, logs estruturados, validacao com FluentValidation, tratamento centralizado de erros, DTOs bem definidos, testes automatizados e ambiente completo com Docker.
+Aplicacao full stack de gerenciamento de tarefas desenvolvida como evolucao de um desafio tecnico, com foco em boas praticas de engenharia, experiencia do usuario e preocupacoes comuns de um ambiente real de desenvolvimento.
 
-## Stack
+O projeto combina um frontend Angular com uma API ASP.NET Core protegida por JWT, persistencia em SQL Server, cache com Redis, mensageria com RabbitMQ, logs estruturados, validacao com FluentValidation, tratamento centralizado de erros, seed de dados para demonstracao e ambiente conteinerizado com Docker Compose.
 
-- Frontend: Angular 20
-- Backend: ASP.NET Core 8 Web API
-- Banco de dados: SQL Server
-- Autenticacao: JWT Bearer
-- Cache: Redis
-- Fila: RabbitMQ
-- Logs: Serilog com JSON estruturado no console
-- Validacao: FluentValidation
-- Testes: xUnit + FluentAssertions + EF Core InMemory
-- Containers: Docker Compose
-- Runtime do frontend em container: Node 20
+## Visao Geral
 
-## O que foi implementado
+Esta entrega foi pensada para ir alem de um CRUD basico. O objetivo foi demonstrar:
 
-- Login e cadastro de usuarios com JWT
-- CRUD de tarefas protegido por autenticacao
-- Separacao das tarefas por usuario autenticado
-- Tema claro/escuro com persistencia no navegador
-- Cache de listas e detalhes de tarefas no Redis
-- Publicacao e consumo de eventos de tarefas no RabbitMQ
-- Tratamento global de erros com payload padronizado
-- Validacao de requests com FluentValidation
-- DTOs de entrada e saida mais consistentes
-- Logs estruturados no backend
-- Testes unitarios para servicos e validadores
-- Orquestracao completa com Docker Compose
+- arquitetura full stack organizada
+- autenticacao e autorizacao com separacao de dados por usuario
+- experiencia de uso mais polida no frontend
+- preocupacoes de backend como cache, fila, logs e tratamento de falhas
+- automacao de ambiente com Docker
+- testes automatizados para regras criticas
 
-## Estrutura
+## Principais Funcionalidades
+
+- cadastro e login de usuarios com JWT
+- CRUD completo de tarefas protegido por autenticacao
+- isolamento de tarefas por usuario autenticado
+- filtro por status
+- tema claro/escuro com persistencia no navegador
+- seed idempotente com usuarios e tarefas de demonstracao
+- cache de listas e detalhes de tarefas com Redis
+- publicacao e consumo de eventos de tarefas com RabbitMQ
+- middleware global de tratamento de erros
+- validacao de entrada com FluentValidation
+- logs estruturados em JSON com Serilog
+
+## Arquitetura
+
+```text
+Angular 20
+   |
+   v
+ASP.NET Core 8 Web API
+   |-- SQL Server 2022  -> persistencia principal
+   |-- Redis            -> cache distribuido
+   |-- RabbitMQ         -> eventos de dominio
+   |-- Serilog          -> logs estruturados
+```
+
+## Stack Tecnica
+
+| Camada | Tecnologia | Responsabilidade |
+| --- | --- | --- |
+| Frontend | Angular 20 | Interface, autenticacao, consumo da API, tema claro/escuro |
+| Backend | ASP.NET Core 8 | API REST, regras de negocio, autenticacao JWT |
+| Persistencia | SQL Server | armazenamento relacional de usuarios e tarefas |
+| Cache | Redis | cache de listas e detalhes de tarefas |
+| Mensageria | RabbitMQ | publicacao e consumo de eventos |
+| Validacao | FluentValidation | validacao declarativa de requests |
+| Logs | Serilog | logs estruturados no console |
+| Testes | xUnit, FluentAssertions, EF InMemory | validacao de servicos e regras de negocio |
+| Containers | Docker Compose | orquestracao do ambiente completo |
+
+## Diferenciais Tecnicos
+
+- autenticacao JWT integrada ponta a ponta entre frontend e backend
+- DTOs bem definidos para requests e responses
+- middleware centralizado para respostas de erro padronizadas
+- cache com invalidacao por usuario e por recurso
+- fila de eventos para registrar alteracoes em tarefas
+- health endpoint para verificacao rapida da API
+- ambiente unico com frontend, backend, banco, Redis e RabbitMQ
+- seed automatico para facilitar avaliacao tecnica e demonstracao
+
+## Estrutura do Projeto
 
 - `frontend/`: aplicacao Angular
 - `backend/TaskManager.Api/`: API ASP.NET Core
 - `backend/TaskManager.Api.Tests/`: testes automatizados do backend
-- `docker-compose.yml`: sobe frontend, backend, SQL Server, Redis e RabbitMQ
+- `docker-compose.yml`: orquestracao do ambiente completo
 - `protagonize-tech.sln`: solucao .NET
 
-## Como rodar com Docker
+## Como Executar com Docker
 
-Pre-requisitos:
+### Pre-requisitos
 
 - Docker Desktop
+
+### Subida completa do ambiente
 
 Na raiz do projeto:
 
@@ -51,34 +89,40 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
-Servicos disponiveis:
+Para rodar em background:
 
-- Frontend: `http://localhost:4200`
-- Backend / Swagger: `http://localhost:5063/swagger`
-- Health check da API: `http://localhost:5063/health`
-- RabbitMQ Management: `http://localhost:15672`
-- SQL Server: `localhost,1433`
-- Redis: `localhost:6379`
+```bash
+docker compose up --build -d
+```
 
-Credenciais padrao do ambiente Docker:
+### Servicos disponiveis
 
-- SQL Server
-  - Usuario: `sa`
-  - Senha: `StrongPassword!123`
-- RabbitMQ
-  - Usuario: `guest`
-  - Senha: `guest`
+| Servico | URL / Porta |
+| --- | --- |
+| Frontend | `http://localhost:4200` |
+| API / Swagger | `http://localhost:5063/swagger` |
+| Health Check | `http://localhost:5063/health` |
+| RabbitMQ Management | `http://localhost:15672` |
+| SQL Server | `localhost,1433` |
+| Redis | `localhost:6379` |
 
-Observacoes:
+### Credenciais padrao
 
-- O backend cria o banco automaticamente ao subir.
-- O backend tambem executa um seed idempotente com usuarios e tarefas de demonstracao.
-- O frontend em container usa Node 20.
-- O frontend acessa a API via `http://localhost:5063`.
+| Recurso | Usuario | Senha |
+| --- | --- | --- |
+| SQL Server | `sa` | `StrongPassword!123` |
+| RabbitMQ | `guest` | `guest` |
 
-## Como rodar localmente sem Docker
+### Observacoes
 
-Pre-requisitos:
+- o backend cria o banco automaticamente ao subir
+- o seed de dados e executado no startup de forma idempotente
+- o frontend em container utiliza Node 20
+- o frontend consome a API em `http://localhost:5063`
+
+## Como Executar Localmente
+
+### Pre-requisitos
 
 - .NET SDK 8
 - Node.js 20
@@ -86,9 +130,9 @@ Pre-requisitos:
 - Redis
 - RabbitMQ
 
-### 1. Backend
+### Backend
 
-Edite `backend/TaskManager.Api/appsettings.json` se precisar ajustar a conexao:
+Se necessario, ajuste a connection string em `backend/TaskManager.Api/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
@@ -96,7 +140,7 @@ Edite `backend/TaskManager.Api/appsettings.json` se precisar ajustar a conexao:
 }
 ```
 
-Depois execute:
+Executar:
 
 ```bash
 dotnet restore
@@ -108,7 +152,7 @@ Endpoints uteis:
 - Swagger: `http://localhost:5063/swagger`
 - Health: `http://localhost:5063/health`
 
-### 2. Frontend
+### Frontend
 
 No diretorio `frontend/`:
 
@@ -121,26 +165,31 @@ Aplicacao:
 
 - `http://localhost:4200`
 
-## Fluxo de autenticacao
+## Fluxo de Autenticacao
 
-1. O usuario cria a conta em `POST /api/auth/register` ou faz login em `POST /api/auth/login`.
-2. A API retorna um `accessToken` JWT e os dados do usuario autenticado.
-3. O Angular salva a sessao no `localStorage`.
-4. Um interceptor adiciona `Authorization: Bearer {token}` automaticamente nas chamadas protegidas.
-5. Se a API responder `401`, a sessao local e encerrada.
+1. O usuario cria uma conta em `POST /api/auth/register` ou faz login em `POST /api/auth/login`.
+2. A API retorna um `accessToken` JWT com os dados do usuario autenticado.
+3. O Angular persiste a sessao localmente.
+4. Um interceptor injeta `Authorization: Bearer {token}` automaticamente nas chamadas protegidas.
+5. Em caso de `401 Unauthorized`, a sessao local e encerrada.
 
-## Dados de demonstracao
+## Dados de Demonstracao
 
-O seed e executado no startup de forma idempotente. Se os usuarios de demo ja existirem, nada e duplicado.
+Para facilitar a avaliacao tecnica, o projeto sobe com seed automatico e idempotente.
 
-Usuarios disponiveis apos a primeira subida:
+Usuarios disponiveis:
 
 - `admin.demo` / `Admin@123`
 - `analista.demo` / `Analista@123`
 
-Cada usuario recebe um conjunto inicial de tarefas para facilitar a avaliacao do CRUD, cache e eventos.
+Cada usuario recebe tarefas iniciais para demonstrar:
 
-## Endpoints principais
+- criacao, edicao e exclusao
+- isolamento de dados por usuario
+- invalidacao de cache
+- emissao de eventos no RabbitMQ
+
+## Resumo da API
 
 ### Autenticacao
 
@@ -158,7 +207,7 @@ Exemplo:
 
 ### Tarefas
 
-Todos exigem token JWT:
+Todos os endpoints abaixo exigem JWT:
 
 - `GET /api/tasks`
 - `GET /api/tasks/{id}`
@@ -176,18 +225,13 @@ Exemplo de payload:
 }
 ```
 
-## Cache, fila e logs
+## Qualidade, Observabilidade e Resiliencia
 
-- Redis guarda listas e itens de tarefas por usuario para reduzir leituras no banco.
-- RabbitMQ recebe eventos `created`, `updated` e `deleted` das tarefas.
-- O consumidor de fila registra o processamento no log.
-- O Serilog escreve logs estruturados em JSON no console, facilitando observabilidade em ambiente local e conteinerizado.
+### Validacao e tratamento de erros
 
-## Validacao e tratamento de erros
-
-- Requests de autenticacao e tarefas usam FluentValidation.
-- Erros de validacao, conflito, nao encontrado e nao autorizado sao tratados por middleware.
-- O retorno de erro segue um contrato padronizado com `title`, `status`, `detail`, `traceId` e `errors` quando aplicavel.
+- validacao declarativa com FluentValidation
+- responses de erro padronizadas com `title`, `status`, `detail`, `traceId` e `errors`
+- tratamento centralizado via middleware
 
 Exemplo de erro:
 
@@ -205,23 +249,40 @@ Exemplo de erro:
 }
 ```
 
+### Cache, fila e logs
+
+- Redis para cache de listas e itens por usuario
+- RabbitMQ para eventos `created`, `updated` e `deleted`
+- Serilog para logs estruturados em JSON no console
+
 ## Testes
 
-Testes implementados no backend:
+Os testes atuais cobrem:
 
 - regras de autenticacao
-- regras do servico de tarefas
-- validadores com FluentValidation
+- comportamento do servico de tarefas
+- validadores de entrada
 
 Executar:
 
 ```bash
-dotnet test
+dotnet test backend/TaskManager.Api.Tests/TaskManager.Api.Tests.csproj -c Release
 ```
 
-## Proximos passos sugeridos
+## Decisoes de Implementacao
+
+- `EnsureCreated()` foi utilizado para agilizar a demonstracao do ambiente completo
+- o seed foi mantido idempotente para permitir subir e derrubar containers sem duplicar dados
+- o frontend usa chamadas diretas para a API local para simplificar a execucao do projeto em avaliacao tecnica
+
+## Melhorias Futuras
 
 - adicionar testes automatizados no frontend
-- trocar `EnsureCreated()` por migrations do EF Core
-- externalizar segredos sensiveis para variaveis de ambiente seguras
-- adicionar rate limiting e refresh token se o projeto evoluir para producao
+- substituir `EnsureCreated()` por migrations do EF Core
+- externalizar segredos para variaveis de ambiente seguras
+- adicionar refresh token e rate limiting
+- servir o frontend por Nginx em build de producao no container
+
+## Consideracoes Finais
+
+Este repositorio foi estruturado para demonstrar capacidade de entrega full stack com preocupacoes reais de engenharia, indo alem da implementacao funcional basica. O foco foi combinar clareza de codigo, experiencia de uso e fundamentos de backend que normalmente aparecem em sistemas profissionais.
