@@ -1,0 +1,45 @@
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <p class="section-label">Formulario</p>
+      <h2>{{ selectedTask ? 'Editar tarefa' : 'Nova tarefa' }}</h2>
+    </div>
+    <button *ngIf="selectedTask" type="button" class="ghost-button" (click)="clearSelection()">
+      Cancelar edicao
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="form">
+    <label>
+      <span>Titulo</span>
+      <input type="text" formControlName="titulo" placeholder="Ex.: Finalizar layout da dashboard">
+      <small *ngIf="form.controls.titulo.touched && form.controls.titulo.invalid">
+        Informe um titulo com ate 150 caracteres.
+      </small>
+    </label>
+
+    <label>
+      <span>Descricao</span>
+      <textarea rows="5" formControlName="descricao" placeholder="Descreva o que precisa ser feito"></textarea>
+      <small *ngIf="form.controls.descricao.touched && form.controls.descricao.invalid">
+        Informe uma descricao com ate 500 caracteres.
+      </small>
+    </label>
+
+    <label>
+      <span>Status</span>
+      <select formControlName="status">
+        <option value="Pendente">Pendente</option>
+        <option value="Concluida">Concluida</option>
+      </select>
+    </label>
+
+    <p *ngIf="feedbackMessage" class="feedback" [class.success]="feedbackType === 'success'" [class.error]="feedbackType === 'error'">
+      {{ feedbackMessage }}
+    </p>
+
+    <button type="submit" class="primary-button" [disabled]="submitting">
+      {{ submitting ? 'Salvando...' : (selectedTask ? 'Atualizar tarefa' : 'Criar tarefa') }}
+    </button>
+  </form>
+</section>

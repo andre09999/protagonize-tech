@@ -1,0 +1,68 @@
+<section class="auth-shell">
+  <div class="intro-card">
+    <p class="eyebrow">Acesso seguro</p>
+    <h2>Entre para gerenciar suas tarefas com JWT</h2>
+    <p>
+      O acesso ao CRUD agora depende de autenticacao. Sua sessao fica salva no navegador e o token e enviado
+      automaticamente para a API.
+    </p>
+
+    <ul class="feature-list">
+      <li>Login e cadastro consumindo a API real</li>
+      <li>Token JWT persistido com logout automatico em erro 401</li>
+      <li>Separacao por usuario no banco, cache e fila</li>
+    </ul>
+  </div>
+
+  <section class="panel">
+    <div class="mode-switch">
+      <button type="button" [class.active]="mode === 'login'" (click)="switchMode('login')">Entrar</button>
+      <button type="button" [class.active]="mode === 'register'" (click)="switchMode('register')">Criar conta</button>
+    </div>
+
+    <div class="panel-header">
+      <div>
+        <p class="section-label">{{ mode === 'login' ? 'Autenticacao' : 'Primeiro acesso' }}</p>
+        <h3>{{ mode === 'login' ? 'Acesse sua conta' : 'Cadastre um novo usuario' }}</h3>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+      <label>
+        <span>Usuario</span>
+        <input type="text" formControlName="username" placeholder="Ex.: maria.silva">
+        <small *ngIf="form.controls.username.touched && form.controls.username.invalid">
+          Informe um usuario entre 3 e 50 caracteres.
+        </small>
+      </label>
+
+      <label>
+        <span>Senha</span>
+        <input type="password" formControlName="password" placeholder="Minimo de 6 caracteres">
+        <small *ngIf="form.controls.password.touched && form.controls.password.invalid">
+          Informe uma senha entre 6 e 100 caracteres.
+        </small>
+      </label>
+
+      <label *ngIf="mode === 'register'">
+        <span>Confirmar senha</span>
+        <input type="password" formControlName="confirmPassword" placeholder="Repita a senha">
+        <small *ngIf="form.controls.confirmPassword.touched && hasInvalidConfirmation()">
+          A confirmacao precisa ser igual a senha informada.
+        </small>
+      </label>
+
+      <p *ngIf="feedbackMessage" class="feedback" [class.success]="feedbackType === 'success'" [class.error]="feedbackType === 'error'">
+        {{ feedbackMessage }}
+      </p>
+
+      <button type="submit" class="primary-button" [disabled]="submitting">
+        {{
+          submitting
+            ? 'Enviando...'
+            : (mode === 'login' ? 'Entrar e carregar tarefas' : 'Criar conta e entrar')
+        }}
+      </button>
+    </form>
+  </section>
+</section>

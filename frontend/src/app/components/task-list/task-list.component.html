@@ -1,0 +1,44 @@
+<section class="panel">
+  <div class="toolbar">
+    <div>
+      <p class="section-label">Tarefas</p>
+      <h2>Lista de tarefas</h2>
+    </div>
+
+    <label class="filter">
+      <span>Filtrar</span>
+      <select [value]="selectedStatus" (change)="filterByStatus(($any($event.target)).value)">
+        <option value="Todos">Todos</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Concluida">Concluida</option>
+      </select>
+    </label>
+  </div>
+
+  <p *ngIf="errorMessage" class="feedback error">{{ errorMessage }}</p>
+  <p *ngIf="loading" class="feedback loading">Carregando tarefas...</p>
+
+  <div class="task-grid" *ngIf="!loading && tasks.length > 0; else emptyState">
+    <article class="task-card" *ngFor="let task of tasks">
+      <div class="task-topline">
+        <span class="badge" [class.done]="task.status === 'Concluida'">{{ task.status }}</span>
+        <span class="date">{{ task.dataCriacao | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <h3>{{ task.titulo }}</h3>
+      <p>{{ task.descricao }}</p>
+
+      <div class="actions">
+        <button type="button" class="ghost-button" (click)="editRequested.emit(task)">Editar</button>
+        <button type="button" class="danger-button" (click)="remove(task)">Excluir</button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state" *ngIf="!loading">
+      <h3>Nenhuma tarefa encontrada</h3>
+      <p>Cadastre uma nova tarefa ou altere o filtro para visualizar outros status.</p>
+    </div>
+  </ng-template>
+</section>

@@ -1,0 +1,61 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: taskmanager-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "StrongPassword!123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  redis:
+    image: redis:7-alpine
+    container_name: taskmanager-redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: taskmanager-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/TaskManager.Api/Dockerfile
+    container_name: taskmanager-api
+    depends_on:
+      - sqlserver
+      - redis
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=TaskManagerDb;User Id=sa;Password=StrongPassword!123;TrustServerCertificate=True;"
+      Redis__ConnectionString: "redis:6379"
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__Username: "guest"
+      RabbitMq__Password: "guest"
+      Jwt__Issuer: "TaskManager.Api"
+      Jwt__Audience: "TaskManager.Web"
+      Jwt__Key: "change-this-super-secret-key-with-at-least-32-characters"
+    ports:
+      - "5063:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: taskmanager-web
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+
+volumes:
+  sqlserver_data:
